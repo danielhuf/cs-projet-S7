@@ -1,0 +1,62 @@
+version: "3.1"
+
+stories:
+
+- story: happy path
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_great
+  - action: utter_happy
+
+- story: first_entry_form
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: affirm
+  - action: first_entry
+  - active_loop: first_entry
+
+- story: second_entry_form
+  steps:
+  - intent: greet
+  - action: utter_greet # are you new ?
+  - intent: deny
+  - action: utter_ask_social_security_number # login
+  - intent: give_social_security_number
+  - action: get_user_data # u ready ?
+  - action: answer_health_form
+  - active_loop: answer_health_form
+  - slot_was_set:
+    - requested_slot: answer_health_form_slot
+  - slot_was_set:
+    - answer_health_form_slot: true
+  - active_loop: null
+  - intent: ready
+  - action: health_form
+  - active_loop: health_form
+
+
+
+# - story: confirm_health_form
+#   steps:
+#   - action: utter_confirm_health_form
+#   - action: health_form
+#   - active_loop: health_form
+
+
+# - story: deny_health_form
+#   steps:
+#   - action: utter_deny_health_form
+
+
+- story: 
+
+- story: test_path
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+  - intent: deny
+  - action: utter_ask_first_entry_mail
+  - intent: give_mail
+  - action: action_signal_mail

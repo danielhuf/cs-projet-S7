@@ -1,0 +1,304 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - mood_great
+  - mood_unhappy
+  - bot_challenge
+  - give_mail
+  - inform
+  - out_of_scope
+  - thankyou
+  - ready
+  - give_weight
+  - give_height
+  - give_social_security_number
+  - give_name
+  - give_gender
+  - give_birth_date
+  - give_sleep
+  - give_location
+
+entities:
+  - name
+  - mail
+  - social_security_number
+  - birth_date
+  - gender
+  - hobby
+  - stress
+  - time
+  - location
+
+slots:
+  #First_entry
+  already_registered:
+    type: bool
+    initial_value: false
+    mappings:
+      - type: from_text
+        intent: None
+  name:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: name
+  mail:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: mail
+  social_security_number:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: social_security_number
+  birth_date:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: birth_date
+  gender:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: gender
+  medical_past:
+    type: text
+    mappings:
+      - type: from_intent
+        condition:
+          - required_slot: medical_past
+        intent: deny
+        value: "None"
+      - type: from_text
+        intent: inform
+  #Health_form
+  start_sleep:
+    type: text
+    influence_conversation: false
+    mappings: 
+      - type: from_entity
+        entity: time
+        role: start_sleep
+  end_sleep:
+    type: text
+    influence_conversation: false
+    mappings: 
+      - type: from_entity
+        entity: time
+        role: end_sleep
+  stress:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: stress
+  location:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: location
+
+  #Hobby
+  confirm_hobby:
+    type: bool
+    influence_conversation: false
+    mappings:
+      - type: from_intent
+        condition:
+          - required_slot: confirm_hobby
+        intent: affirm
+        value: true
+      - type: from_intent
+        condition:
+          - required_slot: confirm_hobby
+        intent: deny
+        value: false
+  hobby:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: hobby
+  hobby_date:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+  #Visits
+  visit_date:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  filled_today:
+    type: bool
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        intent: None
+
+  answer_health_form_slot:
+    type: bool
+    influence_conversation: true
+    mappings:
+      - type: from_intent
+        condition:
+          - required_slot: answer_health_form_slot
+        intent: affirm
+        value: true
+      - type: from_intent
+        condition:
+          - required_slot: answer_health_form_slot
+        intent: deny
+        value: false
+
+forms:
+  first_entry:
+    required_slots:
+      - name
+      - social_security_number
+      - mail
+      - birth_date
+      - gender
+      - medical_past
+  health_form:
+    required_slots:
+      - start_sleep
+      - end_sleep
+      - location
+      - stress
+  visit_form:
+    required_slots:
+      - visitor
+      - visit_date
+  hobby_form:
+    required_slots:
+      - confirm_hobby
+      - hobby
+  answer_health_form:
+    required_slots:
+      - answer_health_form_slot
+
+
+responses:
+  utter_greet:
+  - text: "Hey! Welcome to the Health chatbot! Is it your first time?"
+
+  utter_happy:
+  - text: "Great, carry on!"
+
+  utter_goodbye:
+  - text: "Bye"
+
+  utter_iamabot:
+  - text: "I am a bot, powered by Rasa."
+
+  #First_entry form questions
+
+  utter_ask_first_entry_name :
+  - text: "Could you give me your name?"
+
+  utter_ask_first_entry_social_security_number:
+  - text: "May I ask for your social security number?"
+
+  utter_ask_social_security_number:
+  - text: "May I ask for your social security number?"
+
+  utter_ask_first_entry_mail:
+  - text: "Could you give me your email address?"
+
+  utter_ask_first_entry_birth_date:
+  - text: "Could you give me your birth date? (dd/mm/yyyy)"
+
+  utter_ask_first_entry_gender:
+  - text: "Could you give me your gender?"
+
+  utter_ask_first_entry_medical_past:
+  - text: "Is there any medical history you'd care to share?"
+
+  utter_first_entry_slots_value:
+  - text: "Here's your daily wellness log:\n
+            - Name: {name}\n
+            - Social security: {social_security_number}\n
+            - mail: {mail}\n
+            - birth date: {birth_date}\n
+            - gender: {gender}\n
+            - Medical past : {medical_past}\n"
+
+  #Health_form questions
+  
+  utter_ask_health_form_start_sleep:
+  - text: "Typically, at what time do you manage to sleep and wake? (hh:mm)"
+
+  utter_ask_health_form_stress:
+  - text: "Would you say your stress level is low, medium or high?"
+
+  utter_ask_health_form_location:
+  - text: "Would you give me the postal code of your current location?"
+
+  #Visit_form questions
+
+  utter_ask_visit_form_visit_date:
+  - text: "When did you last receive any visit?"
+
+  #utter_ask_visit_form_visitor:
+  #- text: "Who visited you?"
+
+  #Hobby_form questions
+
+  utter_ask_hobby_form_confirm_hobby:
+  - text: "Did you practice a hobby recently?"
+
+  utter_ask_hobby_form_hobby :
+  - text: "What kind of hobby did you practice?"
+
+  #utter_ask_hobby_opinion:
+  #- text: "You mentioned {hobby} as a hobby, could you give me your newest opinion on the matter?"
+
+  utter_no_worries:
+  - text: "Don't worry about it!"
+
+  utter_slots_value:
+  - text: "TEST : Here's your daily wellness log:\n
+            - Hobby?: {confirm_hobby}\n
+            - Type of hobby: {hobby}\n
+            - Sleep: {start_sleep} {end_sleep}\n
+            - Stress level: {stress}\n
+            - Location: {location}\n"
+
+  utter_ask_ready:
+  - text: "Are you ready for the health form?"
+
+  utter_ask_answer_health_form_answer_health_form_slot:
+  - text: "Would you like to answer the health form?"
+
+  utter_confirm_health_form:
+  - text: "Great! Let's go!"
+
+  utter_deny_health_form:
+  - text: "No worries, you can answer it later!"
+
+
+actions:
+- action_signal_mail
+- set_user_data
+- get_user_data
+- test_db
+- set_latest_health_form
+- ask_hobby_opinion
+- set_hobby_entry
+- set_hobby_opinion
+- check_latest_health_form
+- action_ask_answer_health_form_slot
+- validate_answer_health_form
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

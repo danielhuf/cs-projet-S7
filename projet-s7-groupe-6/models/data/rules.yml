@@ -1,0 +1,109 @@
+version: "3.1"
+
+rules:
+
+- rule: Say goodbye anytime the user says goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: Say 'I am a bot' anytime the user challenges
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+
+- rule: get user data 1
+  steps:
+  - action: utter_greet
+  - intent: deny
+  - action: utter_ask_social_security_number
+
+- rule: get user data 2
+  condition:
+  - active_loop: null
+  steps:
+  - action: utter_ask_social_security_number
+  - intent: give_social_security_number
+  - action: get_user_data
+  - action: answer_health_form
+  - active_loop: answer_health_form
+  #- action: utter_first_entry_slots_value
+
+- rule: Activate first entry form
+  steps:
+  - action: first_entry
+  - active_loop: first_entry
+
+- rule: Submit first entry form
+  condition:
+  - active_loop: health_form
+  steps:
+  - action: first_entry
+  - active_loop: null
+  - slot_was_set: 
+    - requested_slot: null
+  - action: utter_first_entry_slots_value
+  - action: set_user_data
+  - action: utter_ask_ready
+
+- rule: Activate Health form
+  steps:
+  - intent: ready
+  - action: health_form
+  - active_loop: health_form
+
+- rule: Submit health_form
+  condition:
+  - active_loop: health_form
+  steps:
+  - action: health_form
+  - active_loop: null
+  - slot_was_set: 
+    - requested_slot: null
+  - action: utter_slots_value
+  - action: set_latest_health_form
+
+- rule: Activate hobby form
+  steps:
+  - action: hobby_form
+  - active_loop: hobby_form
+
+- rule: Submit hobby form
+  condition:
+  - active_loop: hobby_form
+  steps:
+  - action: hobby_form
+  - active_loop: null
+  - slot_was_set: 
+    - requested_slot: null
+  - action: set_hobby_entry
+  - action: ask_hobby_opinion
+
+- rule: Update Health form
+  condition:
+    - slot_was_set:
+      - filled_today
+  steps:
+  - action: check_latest_health_form
+  - intent: affirm
+  - action: health_form
+  - active_loop: health_form
+
+# - rule: Interruption in Answer Health form
+#   condition:
+#   # Condition that form is active.
+#   - active_loop: answer_health_form
+#   steps:
+#   # This unhappy path handles the case of an intent `deny`.
+#   - intent: deny
+#   - action: utter_deny_health_form
+#   - active_loop: null
+- rule: Submit Answer Health form
+  condition:
+  - active_loop: answer_health_form
+  steps:
+  - action: answer_health_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+
